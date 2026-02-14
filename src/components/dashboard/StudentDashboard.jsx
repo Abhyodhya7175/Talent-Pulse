@@ -10,12 +10,8 @@ import logo from '../../assets/talent-pulse-logo.png';
 const StudentDashboard = () => {
   // State to track which job menu is currently open (collapsed/expanded)
   const [openMenuId, setOpenMenuId] = useState(null);
-  // State to track which nav menu is currently open
-  const [openNavMenuId, setOpenNavMenuId] = useState(null);
-
-  const toggleNavMenu = (id) => {
-    setOpenNavMenuId(openNavMenuId === id ? null : id);
-  };
+  // State to track active nav item
+  const [activeNav, setActiveNav] = useState('dashboard');
 
   // Sample data - This will eventually come from your Python/FastAPI ML model
   const jobs = [
@@ -27,115 +23,109 @@ const StudentDashboard = () => {
     setOpenMenuId(openMenuId === id ? null : id);
   };
 
+  const navItems = [
+    { id: 'dashboard', label: 'Dashboard', icon: Layout },
+    { id: 'recommendations', label: 'Recommendations', icon: Briefcase },
+    { id: 'profile', label: 'My Profile', icon: User },
+    { id: 'settings', label: 'Settings', icon: Settings },
+  ];
+
   return (
-    <div className="min-h-screen flex transition-colors duration-500 bg-slate-50 dark:bg-[#0f172a] text-slate-900 dark:text-white font-sans">
+    <div className="min-h-screen flex flex-col transition-colors duration-500 bg-slate-50 dark:bg-[#0f172a] text-slate-900 dark:text-white font-sans">
       
-      {/* --- SIDEBAR NAVIGATION --- */}
-      <aside className="w-64 border-r border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 p-6 flex flex-col transition-colors">
-        <div className="flex items-center mb-10 px-2">
-          <img
-          src={logo}
-          alt="Talent Pulse"
-          className="h-14 w-auto object-contain"
-          />
+      {/* --- TOP NAVBAR --- */}
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-[#1e293b] border-b border-slate-200 dark:border-white/10 shadow-sm">
+        <div className="w-full px-6">
+          <div className="flex items-center justify-between h-20">
+            
+            {/* Logo - Big and Visible - Leftmost Corner */}
+            <div className="flex-shrink-0">
+              <img
+                src={logo}
+                alt="Talent Pulse"
+                className="h-16 w-auto object-contain"
+              />
+            </div>
+
+            {/* Navigation Links - Center */}
+            <div className="hidden md:flex items-center space-x-10">
+              {navItems.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => setActiveNav(item.id)}
+                    className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all ${
+                      activeNav === item.id
+                        ? 'bg-indigo-600 text-white shadow-md'
+                        : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/10'
+                    }`}
+                  >
+                    <Icon size={18} />
+                    <span>{item.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Logout Button - Right */}
+            <div className="flex items-center gap-3">
+              <button className="p-2.5 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl hover:bg-slate-200 dark:hover:bg-white/10 transition-all relative">
+                <Bell size={20} className="text-slate-500" />
+                <span className="absolute top-2 right-2 w-2 h-2 bg-indigo-600 rounded-full border-2 border-white dark:border-[#1e293b]"></span>
+              </button>
+              <Link 
+                to="/" 
+                className="flex items-center gap-2 px-4 py-2.5 bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white rounded-xl transition-all font-medium"
+              >
+                <LogOut size={18} />
+                <span className="hidden sm:inline">Logout</span>
+              </Link>
+            </div>
+          </div>
         </div>
 
-
-        <nav className="flex-1 space-y-2">
-          <div className="relative">
-            <button className="w-full flex items-center gap-3 px-4 py-3 bg-indigo-600 text-white rounded-xl font-semibold transition-all shadow-md">
-              <Layout size={20} /> Dashboard
-              <span className="ml-auto" onClick={(e) => { e.stopPropagation(); toggleNavMenu('dashboard'); }}>
-                <MoreVertical size={18} className="hover:opacity-80" />
-              </span>
-            </button>
-            {openNavMenuId === 'dashboard' && (
-              <div className="absolute left-0 mt-2 w-full bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-white/10 rounded-xl shadow-2xl z-50 overflow-hidden">
-                <button className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-600 dark:text-slate-300 hover:bg-indigo-600 hover:text-white transition-all text-left">
-                  <ExternalLink size={14} /> Open in New Tab
-                </button>
-                <button className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-600 dark:text-slate-300 hover:bg-indigo-600 hover:text-white transition-all text-left">
-                  <Bookmark size={14} /> Pin to Top
-                </button>
-              </div>
-            )}
-          </div>
-          <div className="relative">
-            <button className="w-full flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 rounded-xl transition-all">
-              <Briefcase size={20} /> Recommendations
-              <span className="ml-auto" onClick={(e) => { e.stopPropagation(); toggleNavMenu('recommendations'); }}>
-                <MoreVertical size={18} className="hover:text-indigo-600" />
-              </span>
-            </button>
-            {openNavMenuId === 'recommendations' && (
-              <div className="absolute left-0 mt-2 w-full bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-white/10 rounded-xl shadow-2xl z-50 overflow-hidden">
-                <button className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-600 dark:text-slate-300 hover:bg-indigo-600 hover:text-white transition-all text-left">
-                  <ExternalLink size={14} /> Open in New Tab
-                </button>
-                <button className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-600 dark:text-slate-300 hover:bg-indigo-600 hover:text-white transition-all text-left">
-                  <Bookmark size={14} /> Pin to Top
-                </button>
-              </div>
-            )}
-          </div>
-          <div className="relative">
-            <button className="w-full flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 rounded-xl transition-all">
-              <User size={20} /> My Profile
-              <span className="ml-auto" onClick={(e) => { e.stopPropagation(); toggleNavMenu('profile'); }}>
-                <MoreVertical size={18} className="hover:text-indigo-600" />
-              </span>
-            </button>
-            {openNavMenuId === 'profile' && (
-              <div className="absolute left-0 mt-2 w-full bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-white/10 rounded-xl shadow-2xl z-50 overflow-hidden">
-                <button className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-600 dark:text-slate-300 hover:bg-indigo-600 hover:text-white transition-all text-left">
-                  <ExternalLink size={14} /> Open in New Tab
-                </button>
-                <button className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-slate-600 dark:text-slate-300 hover:bg-indigo-600 hover:text-white transition-all text-left">
-                  <Bookmark size={14} /> Pin to Top
-                </button>
-              </div>
-            )}
-          </div>
-        </nav>
-
-        {/* --- SETTINGS & LOGOUT --- */}
-        <div className="pt-6 border-t border-slate-200 dark:border-white/10 space-y-2">
-          <button 
-            className="w-full flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 rounded-xl transition-all"
-          >
-            <Settings size={20} /> Settings
-          </button>
-          <Link to="/" className="w-full flex items-center gap-3 px-4 py-3 text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-xl transition-all font-medium">
-            <LogOut size={20} /> Logout
-          </Link>
+        {/* Mobile Navigation */}
+        <div className="md:hidden border-t border-slate-200 dark:border-white/10 px-4 py-2 flex items-center justify-around overflow-x-auto">
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            return (
+              <button
+                key={item.id}
+                onClick={() => setActiveNav(item.id)}
+                className={`flex flex-col items-center gap-1 px-3 py-2 rounded-xl transition-all ${
+                  activeNav === item.id
+                    ? 'text-indigo-600 dark:text-indigo-400'
+                    : 'text-slate-500 dark:text-slate-400'
+                }`}
+              >
+                <Icon size={20} />
+                <span className="text-xs font-medium">{item.label}</span>
+              </button>
+            );
+          })}
         </div>
-      </aside>
+      </nav>
 
       {/* --- MAIN CONTENT AREA --- */}
-      <main className="flex-1 p-8 overflow-y-auto relative">
+      <main className="flex-1 p-8 pt-32 md:pt-28 overflow-y-auto relative">
         {/* Subtle Background Glow for Dark Mode */}
         <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-600/5 rounded-full filter blur-[100px] pointer-events-none"></div>
 
         {/* Header Section */}
-        <header className="flex justify-between items-center mb-10 relative z-10">
+        <header className="flex flex-col md:flex-row md:justify-between md:items-center mb-10 relative z-10 gap-4">
           <div>
-            <h1 className="text-3xl font-extrabold mb-1">Welcome, Abhyodhya Kumar! </h1>
+            <h1 className="text-3xl font-extrabold mb-1">Welcome, Abhyodhya Kumar!</h1>
             <p className="text-slate-500 dark:text-slate-400">Your AI-matched career opportunities are ready.</p>
           </div>
           
-          <div className="flex items-center gap-4">
-            <div className="relative hidden md:block">
-              <Search className="absolute left-3 top-2.5 text-slate-400" size={18} />
-              <input 
-                type="text" 
-                placeholder="Search jobs..." 
-                className="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl pl-10 pr-4 py-2 outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all w-64 dark:text-white"
-              />
-            </div>
-            <button className="p-2.5 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl hover:bg-slate-100 dark:hover:bg-white/10 transition-all relative">
-              <Bell size={22} className="text-slate-500" />
-              <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-indigo-600 rounded-full border-2 border-white dark:border-[#0f172a]"></span>
-            </button>
+          <div className="relative">
+            <Search className="absolute left-3 top-2.5 text-slate-400" size={18} />
+            <input 
+              type="text" 
+              placeholder="Search jobs..." 
+              className="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl pl-10 pr-4 py-2 outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all w-full md:w-72 dark:text-white"
+            />
           </div>
         </header>
 

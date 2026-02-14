@@ -33,10 +33,10 @@ const Login = () => {
           <Link to="/admin/login" className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-slate-400 text-xs font-bold hover:text-white transition-all">
             <ShieldCheck size={14} /> Admin
           </Link>
-        </div>
+        </div> 
 
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-white tracking-tight mb-2">Talent Pulse</h1>
+          <h1 className="text-3xl font-extrabold text-white tracking-tight mb-2" style={{ fontFamily: 'BerlinSans' }}>Talent Pulse</h1>
           <p className="text-slate-400 text-sm font-medium">Empowering your career with AI intelligence.</p>
         </div>
 
