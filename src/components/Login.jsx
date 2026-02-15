@@ -36,7 +36,7 @@ const Login = () => {
         </div> 
 
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-extrabold text-white tracking-tight mb-2" style={{ fontFamily: 'BerlinSans' }}>Talent Pulse</h1>
+          <h1 className="text-3xl font-extrabold text-white tracking-tight mb-2" style={{ fontFamily: 'Space Grotesk' }}>Talent Pulse</h1>
           <p className="text-slate-400 text-sm font-medium">Empowering your career with AI intelligence.</p>
         </div>
 
