@@ -4,7 +4,14 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Apply the font globally */
+/* Apply the font globally 
 body {
   font-family: 'Plus Jakarta Sans', sans-serif;
-}
+}*/
+
+/*@font-face {
+  font-family: 'BerlinSans';
+  src: url('./assets/fonts/BerlinSans.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}*/

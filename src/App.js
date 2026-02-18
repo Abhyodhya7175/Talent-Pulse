@@ -5,6 +5,7 @@ import Register from './components/Register';
 import RecruiterLogin from './components/RecruiterLogin';
 import AdminLogin from './components/AdminLogin';
 import StudentDashboard from './components/dashboard/StudentDashboard';
+import Recommendations from './components/dashboard/Recommendations';
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
         <Route path="/recruiter/login" element={<RecruiterLogin />} />
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/student/dashboard" element={<StudentDashboard />} />
+        <Route path="/student/recommendations" element={<Recommendations />} />
       </Routes>
     </Router>
   );

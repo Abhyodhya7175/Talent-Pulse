@@ -9,6 +9,10 @@ module.exports = {
         
         // Class: font-playwrite (For specific accents/handwritten style)
         playwrite: ['"Playwrite NZ Basic"', 'cursive'],
+
+        climate: ['"Climate Crisis"', 'cursive'],
+
+        heading: ['Sora', 'sans-serif'],
         
         // Class: font-body (For general text)
         body: ['Inter', 'sans-serif'],

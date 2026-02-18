@@ -25,10 +25,10 @@ const StudentDashboard = () => {
   };
 
   const navItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: Layout },
-    { id: 'recommendations', label: 'Recommendations', icon: Briefcase },
-    { id: 'profile', label: 'My Profile', icon: User },
-    { id: 'settings', label: 'Settings', icon: Settings },
+    { id: 'dashboard', label: 'Dashboard', icon: Layout, path: '/student/dashboard' },
+    { id: 'recommendations', label: 'Recommendations', icon: Briefcase, path: '/student/recommendations' },
+    { id: 'profile', label: 'My Profile', icon: User, path: '/student/profile' },
+    { id: 'settings', label: 'Settings', icon: Settings, path: '/student/settings' },
   ];
 
   return (
@@ -53,9 +53,9 @@ const StudentDashboard = () => {
               {navItems.map((item) => {
                 const Icon = item.icon;
                 return (
-                  <button
+                  <Link
                     key={item.id}
-                    onClick={() => setActiveNav(item.id)}
+                    to={item.path}
                     className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all ${
                       activeNav === item.id
                         ? 'bg-indigo-600 text-white shadow-md'
@@ -64,7 +64,7 @@ const StudentDashboard = () => {
                   >
                     <Icon size={18} />
                     <span>{item.label}</span>
-                  </button>
+                  </Link>
                 );
               })}
             </div>
@@ -91,9 +91,9 @@ const StudentDashboard = () => {
           {navItems.map((item) => {
             const Icon = item.icon;
             return (
-              <button
+              <Link
                 key={item.id}
-                onClick={() => setActiveNav(item.id)}
+                to={item.path}
                 className={`flex flex-col items-center gap-1 px-3 py-2 rounded-xl transition-all ${
                   activeNav === item.id
                     ? 'text-indigo-600 dark:text-indigo-400'
@@ -102,7 +102,7 @@ const StudentDashboard = () => {
               >
                 <Icon size={20} />
                 <span className="text-xs font-medium">{item.label}</span>
-              </button>
+              </Link>
             );
           })}
         </div>
@@ -127,7 +127,7 @@ const StudentDashboard = () => {
                   <Sparkles size={20} className="text-yellow-300" />
                   <span className="text-indigo-200 text-sm font-medium">AI-Powered Matching</span>
                 </div>
-                <h1 className="text-3xl md:text-4xl font-playwrite font-extrabold tracking-tighter mb-2">Welcome back, Abhyodhya!</h1>
+                <h1 className="text-3xl md:text-4xl text-white-500 font-playwrite font-extrabold tracking-tighter mb-2">Welcome back, Abhyodhya!</h1>
                 <p className="text-indigo-100 text-lg">Your personalized career opportunities await.</p>
               </div>
               
@@ -195,8 +195,8 @@ const StudentDashboard = () => {
         <section className="relative z-10">
           <div className="flex justify-between items-center mb-6">
             <div>
-              <h2 className="text-2xl font-bold mb-1">Recommended for You</h2>
-              <p className="text-slate-500 dark:text-slate-400 text-sm">Jobs matching your profile and preferences</p>
+              <h2 className="text-2xl font-heading font-boldmb-1">Recommended for You</h2>
+              <p className="text-slate-500 font-body dark:text-slate-400 text-sm">Jobs matching your profile and preferences</p>
             </div>
             <button className="text-indigo-600 dark:text-indigo-400 text-sm font-semibold hover:underline flex items-center gap-1">
               View All <ChevronRight size={16} />
