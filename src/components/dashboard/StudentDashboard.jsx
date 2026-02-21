@@ -196,7 +196,7 @@ const StudentDashboard = () => {
           <div className="flex justify-between items-center mb-6">
             <div>
               <h2 className="text-2xl font-heading font-boldmb-1">Recommended for You</h2>
-              <p className="text-slate-500 font-body dark:text-slate-400 text-sm">Jobs matching your profile and preferences</p>
+              <p className="text-slate-500 font-body  dark:text-slate-400 text-sm">Jobs matching your profile and preferences</p>
             </div>
             <button className="text-indigo-600 dark:text-indigo-400 text-sm font-semibold hover:underline flex items-center gap-1">
               View All <ChevronRight size={16} />

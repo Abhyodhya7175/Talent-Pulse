@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { 
   Layout, Briefcase, User, Settings, LogOut, Search, 
   Bell, Filter, MapPin, Clock, 
-  MoreVertical, ExternalLink, Bookmark, Ban, Sparkles
+  MoreVertical, ExternalLink, Bookmark, Ban, Sparkles,
+  Check, X, TrendingUp, Crown
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import logo from '../../assets/talent-pulse-logo.png';
@@ -10,13 +11,74 @@ import logo from '../../assets/talent-pulse-logo.png';
 const Recommendations = () => {
   const [openMenuId, setOpenMenuId] = useState(null);
   const [activeNav, setActiveNav] = useState('recommendations');
+  const [hoveredMatchId, setHoveredMatchId] = useState(null);
 
   // Sample data simulating the AI recommendation engine results
   const recommendedJobs = [
-    { id: 1, title: "Backend Engineer", company: "Meta", loc: "Remote", type: "Full-time", score: 96, tags: ["Python", "FastAPI", "PostgreSQL"], logo: "https://img.logo.dev/meta.com?token=pk_H1z1R2K2SxuyCCd3izKt5w&size=154&retina=true" },
-    { id: 2, title: "Data Scientist", company: "Tesla", loc: "Austin, TX", type: "Full-time", score: 89, tags: ["Python", "PyTorch", "ML"], logo: "https://img.logo.dev/tesla.com?token=pk_H1z1R2K2SxuyCCd3izKt5w&size=194&retina=true" },
-    { id: 3, title: "Full Stack Developer", company: "Netflix", loc: "Los Gatos, CA", type: "Contract", score: 92, tags: ["Next.js", "Node.js", "Tailwind"], logo: "https://img.logo.dev/netflix.com?token=pk_H1z1R2K2SxuyCCd3izKt5w&size=194&retina=true" },
-    { id: 4, title: "Product Designer", company: "Spotify", loc: "Remote", type: "Full-time", score: 84, tags: ["Figma", "UI/UX", "Research"], logo: "https://img.logo.dev/spotify.com?token=pk_H1z1R2K2SxuyCCd3izKt5w&size=194&retina=true" },
+    { 
+      id: 1, 
+      title: "Backend Engineer", 
+      company: "Meta", 
+      loc: "Remote", 
+      type: "Full-time", 
+      score: 96, 
+      tags: ["Python", "FastAPI", "PostgreSQL"], 
+      logo: "https://img.logo.dev/meta.com?token=pk_H1z1R2K2SxuyCCd3izKt5w&size=154&retina=true",
+      matchDetails: { 
+        skillsMatched: ["Python", "FastAPI"], 
+        skillsMissing: ["PostgreSQL"],
+        experienceMatch: true,
+        locationMatch: true
+      } 
+    },
+    { 
+      id: 2, 
+      title: "Data Scientist", 
+      company: "Tesla", 
+      loc: "Austin, TX", 
+      type: "Full-time", 
+      score: 89, 
+      tags: ["Python", "PyTorch", "ML"], 
+      logo: "https://img.logo.dev/tesla.com?token=pk_H1z1R2K2SxuyCCd3izKt5w&size=194&retina=true",
+      matchDetails: { 
+        skillsMatched: ["Python", "ML"], 
+        skillsMissing: ["PyTorch"],
+        experienceMatch: true,
+        locationMatch: false
+      } 
+    },
+    { 
+      id: 3, 
+      title: "Full Stack Developer", 
+      company: "Netflix", 
+      loc: "Los Gatos, CA", 
+      type: "Contract", 
+      score: 92, 
+      tags: ["Next.js", "Node.js", "Tailwind"], 
+      logo: "https://img.logo.dev/netflix.com?token=pk_H1z1R2K2SxuyCCd3izKt5w&size=194&retina=true",
+      matchDetails: { 
+        skillsMatched: ["Next.js", "Node.js", "Tailwind"], 
+        skillsMissing: [],
+        experienceMatch: true,
+        locationMatch: false
+      } 
+    },
+    { 
+      id: 4, 
+      title: "Product Designer", 
+      company: "Spotify", 
+      loc: "Remote", 
+      type: "Full-time", 
+      score: 84, 
+      tags: ["Figma", "UI/UX", "Research"], 
+      logo: "https://img.logo.dev/spotify.com?token=pk_H1z1R2K2SxuyCCd3izKt5w&size=194&retina=true",
+      matchDetails: { 
+        skillsMatched: ["Figma", "UI/UX"], 
+        skillsMissing: ["Research"],
+        experienceMatch: false,
+        locationMatch: true
+      } 
+    },
   ];
 
   const navItems = [
@@ -141,8 +203,34 @@ const Recommendations = () => {
           </div>
 
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-            {recommendedJobs.map((job) => (
-              <div key={job.id} className="bg-white dark:bg-white/5 border border-slate-200/80 dark:border-white/10 p-6 rounded-3xl flex gap-5 items-start relative hover:border-indigo-500/50 hover:shadow-xl hover:shadow-indigo-500/5 transition-all duration-300 group">
+            {recommendedJobs.map((job) => {
+              // Determine if this is the top pick (highest score)
+              const isTopPick = job.score === Math.max(...recommendedJobs.map(j => j.score));
+              
+              return (
+              <div 
+                key={job.id} 
+                className={`bg-white dark:bg-white/5 border p-6 rounded-3xl flex gap-5 items-start relative hover:shadow-xl transition-all duration-300 group ${
+                  isTopPick 
+                    ? 'border-amber-400/50 dark:border-amber-500/30 shadow-lg shadow-amber-500/10 hover:shadow-amber-500/20 ring-1 ring-amber-400/20' 
+                    : 'border-slate-200/80 dark:border-white/10 hover:border-indigo-500/50 hover:shadow-indigo-500/5'
+                }`}
+              >
+                
+                {/* Top Pick Ribbon */}
+                {isTopPick && (
+                  <div className="absolute -top-3 left-6 z-10">
+                    <div className="flex items-center gap-1.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-xs px-3 py-1.5 rounded-full font-bold shadow-lg shadow-amber-500/30">
+                      <Crown size={12} className="fill-white" />
+                      <span>Top Pick for You</span>
+                    </div>
+                  </div>
+                )}
+                
+                {/* Subtle glow effect for top pick */}
+                {isTopPick && (
+                  <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-amber-500/5 via-transparent to-orange-500/5 pointer-events-none"></div>
+                )}
                 
                 {/* --- COLLAPSIBLE THREE-DOT MENU --- */}
                 <div className="absolute top-5 right-5">
@@ -204,16 +292,111 @@ const Recommendations = () => {
                   </div>
 
                   <div className="flex items-center justify-between">
-                    <span className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-xs px-4 py-2 rounded-full font-bold shadow-sm">
-                      {job.score}% AI Match
-                    </span>
+                    {/* Match Badge with Insight Popover */}
+                    <div 
+                      className="relative"
+                      onMouseEnter={() => setHoveredMatchId(job.id)}
+                      onMouseLeave={() => setHoveredMatchId(null)}
+                    >
+                      <span className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-xs px-4 py-2 rounded-full font-bold shadow-sm cursor-help flex items-center gap-1.5 hover:shadow-lg hover:scale-105 transition-all">
+                        <TrendingUp size={12} />
+                        {job.score}% AI Match
+                      </span>
+                      
+                      {/* Match Insight Popover */}
+                      {hoveredMatchId === job.id && job.matchDetails && (
+                        <div className="absolute bottom-full left-0 mb-3 w-72 bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-white/10 rounded-2xl shadow-2xl z-50 overflow-hidden animate-in fade-in slide-in-from-bottom-2 duration-200">
+                          {/* Popover Arrow */}
+                          <div className="absolute -bottom-2 left-6 w-4 h-4 bg-white dark:bg-[#1e293b] border-r border-b border-slate-200 dark:border-white/10 transform rotate-45"></div>
+                          
+                          {/* Header */}
+                          <div className="bg-gradient-to-r from-indigo-600 to-purple-600 px-4 py-3">
+                            <div className="flex items-center gap-2 text-white">
+                              <Sparkles size={16} />
+                              <span className="font-bold text-sm">Match Insight</span>
+                            </div>
+                            <p className="text-indigo-100 text-xs mt-1">Why you're a {job.score}% match</p>
+                          </div>
+                          
+                          {/* Content */}
+                          <div className="p-4 space-y-4">
+                            {/* Skills You Have */}
+                            {job.matchDetails.skillsMatched.length > 0 && (
+                              <div>
+                                <div className="flex items-center gap-2 mb-2">
+                                  <div className="w-5 h-5 bg-green-100 dark:bg-green-500/20 rounded-full flex items-center justify-center">
+                                    <Check size={12} className="text-green-600 dark:text-green-400" />
+                                  </div>
+                                  <span className="text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Skills You Have</span>
+                                </div>
+                                <div className="flex flex-wrap gap-1.5 ml-7">
+                                  {job.matchDetails.skillsMatched.map(skill => (
+                                    <span key={skill} className="px-2.5 py-1 bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-400 rounded-lg text-xs font-medium">
+                                      {skill}
+                                    </span>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                            
+                            {/* Skills to Develop */}
+                            {job.matchDetails.skillsMissing.length > 0 && (
+                              <div>
+                                <div className="flex items-center gap-2 mb-2">
+                                  <div className="w-5 h-5 bg-amber-100 dark:bg-amber-500/20 rounded-full flex items-center justify-center">
+                                    <X size={12} className="text-amber-600 dark:text-amber-400" />
+                                  </div>
+                                  <span className="text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Skills to Develop</span>
+                                </div>
+                                <div className="flex flex-wrap gap-1.5 ml-7">
+                                  {job.matchDetails.skillsMissing.map(skill => (
+                                    <span key={skill} className="px-2.5 py-1 bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-400 rounded-lg text-xs font-medium">
+                                      {skill}
+                                    </span>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                            
+                            {/* Additional Match Factors */}
+                            <div className="pt-3 border-t border-slate-100 dark:border-white/5">
+                              <div className="flex items-center justify-between text-xs">
+                                <span className="text-slate-500 dark:text-slate-400">Experience Level</span>
+                                <span className={`font-medium flex items-center gap-1 ${job.matchDetails.experienceMatch ? 'text-green-600 dark:text-green-400' : 'text-amber-600 dark:text-amber-400'}`}>
+                                  {job.matchDetails.experienceMatch ? <Check size={12} /> : <X size={12} />}
+                                  {job.matchDetails.experienceMatch ? 'Match' : 'Partial'}
+                                </span>
+                              </div>
+                              <div className="flex items-center justify-between text-xs mt-2">
+                                <span className="text-slate-500 dark:text-slate-400">Location Preference</span>
+                                <span className={`font-medium flex items-center gap-1 ${job.matchDetails.locationMatch ? 'text-green-600 dark:text-green-400' : 'text-amber-600 dark:text-amber-400'}`}>
+                                  {job.matchDetails.locationMatch ? <Check size={12} /> : <X size={12} />}
+                                  {job.matchDetails.locationMatch ? 'Match' : 'Partial'}
+                                </span>
+                              </div>
+                            </div>
+                            
+                            {/* CTA */}
+                            {job.matchDetails.skillsMissing.length > 0 && (
+                              <Link 
+                                to="/student/profile" 
+                                className="block text-center text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 pt-2"
+                              >
+                                Update your profile to improve match →
+                              </Link>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                    </div>
                     <button className="text-indigo-600 dark:text-indigo-400 text-sm font-semibold hover:underline opacity-0 group-hover:opacity-100 transition-opacity">
                       Quick Apply →
                     </button>
                   </div>
                 </div>
               </div>
-            ))}
+            );
+            })}
           </div>
         </section>
       </main>
