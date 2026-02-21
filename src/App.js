@@ -6,6 +6,7 @@ import RecruiterLogin from './components/RecruiterLogin';
 import AdminLogin from './components/AdminLogin';
 import StudentDashboard from './components/dashboard/StudentDashboard';
 import Recommendations from './components/dashboard/Recommendations';
+import Profile from './components/dashboard/Profile';
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/student/dashboard" element={<StudentDashboard />} />
         <Route path="/student/recommendations" element={<Recommendations />} />
+        <Route path="/student/profile" element={<Profile />} />
       </Routes>
     </Router>
   );
