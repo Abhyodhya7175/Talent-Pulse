@@ -7,6 +7,8 @@ import AdminLogin from './components/AdminLogin';
 import StudentDashboard from './components/dashboard/StudentDashboard';
 import Recommendations from './components/dashboard/Recommendations';
 import Profile from './components/dashboard/Profile';
+import SettingsPage from './components/dashboard/SettingsPage';
+import NotificationsPage from './components/dashboard/NotificationsPage';
 
 function App() {
   return (
@@ -19,6 +21,8 @@ function App() {
         <Route path="/student/dashboard" element={<StudentDashboard />} />
         <Route path="/student/recommendations" element={<Recommendations />} />
         <Route path="/student/profile" element={<Profile />} />
+        <Route path="/student/settings" element={<SettingsPage />} />
+        <Route path="/student/notifications" element={<NotificationsPage />} />
       </Routes>
     </Router>
   );
