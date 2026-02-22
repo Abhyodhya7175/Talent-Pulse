@@ -12,6 +12,8 @@ const Login = () => {
     navigate('/student/dashboard');
   };
 
+
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#0f172a] relative overflow-hidden font-sans px-4">
       

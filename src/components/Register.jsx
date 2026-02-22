@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Eye, EyeOff, Mail, Lock, User, Chrome, Linkedin, ArrowLeft } from 'lucide-react';
 import {Link} from 'react-router-dom';
 
-const Register = ({ onBackToLogin }) => {
+const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [formData, setFormData] = useState({
@@ -49,13 +49,13 @@ const Register = ({ onBackToLogin }) => {
 
       <div className="bg-white/10 backdrop-blur-lg rounded-3xl p-8 w-full max-w-md shadow-2xl border border-white/20">
         {/* Back Button */}
-        <button
-          onClick={onBackToLogin}
+        <Link
+          to="/"
           className="flex items-center text-white/80 hover:text-white transition-colors mb-4 font-plus-jakarta"
         >
           <ArrowLeft className="w-5 h-5 mr-2" />
           Back to Login
-        </button>
+        </Link>
 
         {/* Header */}
         <div className="text-center mb-8">
@@ -266,12 +266,12 @@ const Register = ({ onBackToLogin }) => {
         <div className="mt-8 text-center">
           <p className="text-white/60 font-plus-jakarta">
             Already have an account?{' '}
-            <button 
-              onClick={onBackToLogin}
+            <Link 
+              to="/"
               className="text-white hover:text-white/80 transition-colors font-medium"
             >
               Sign in
-            </button>
+            </Link>
           </p>
         </div>
       </div>

@@ -9,6 +9,7 @@ import Recommendations from './components/dashboard/Recommendations';
 import Profile from './components/dashboard/Profile';
 import SettingsPage from './components/dashboard/SettingsPage';
 import NotificationsPage from './components/dashboard/NotificationsPage';
+import RecruiterDashboard from './components/recdashboard/RecruiterDashboard';
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
         <Route path="/student/profile" element={<Profile />} />
         <Route path="/student/settings" element={<SettingsPage />} />
         <Route path="/student/notifications" element={<NotificationsPage />} />
+        <Route path="/recruiter/dashboard" element={<RecruiterDashboard />} />
       </Routes>
     </Router>
   );
