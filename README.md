@@ -4,6 +4,26 @@ TalentPulse is a modern, intelligent career platform designed to empower student
 
 ## 🚀 Recent Updates
 
+### � Job Postings Management
+- **Postings Dashboard**: Dedicated page for recruiters to manage all job listings with stats overview (Total Jobs, Active, Applicants, Views).
+- **Search & Filter**: Search jobs by title, department, location, or skills; filter by status (Active, Paused, Draft, Expired).
+- **Rich Job Cards**: Each posting displays:
+  - Job title with color-coded status badge (Active/Green, Paused/Amber, Draft/Gray, Expired/Red)
+  - Department, location, salary range, and employment type
+  - Required skills as indigo tags
+  - Metrics: Views, Applicants, AI-Shortlisted count
+  - Days remaining until expiry indicator
+  - Posted and expiration dates
+- **Actions Dropdown**: Context menu for each job with View Details, Edit, Duplicate, Pause/Resume, and Delete options.
+- **Create Job Modal**: Full-featured form to create new postings with:
+  - Job title, department, and location fields
+  - Employment type selector (Full-time, Part-time, Contract, Internship)
+  - Salary range inputs
+  - Required skills (comma-separated)
+  - Job description textarea
+  - AI-Powered Matching notice
+  - Save as Draft or Publish options
+
 ### 👔 Recruiter Dashboard
 - **Recruiter Hub**: Full-featured dashboard for recruiters to manage job postings and review candidates.
 - **AI Shortlisting**: View AI-matched candidates with match scores and application status.
@@ -47,7 +67,9 @@ TalentPulse is a modern, intelligent career platform designed to empower student
   - `/` - Student Login
   - `/register` - Account Registration
   - `/recruiter/login` - Recruiter Login
+  - `/recruiter` - Recruiter Dashboard
   - `/recruiter/dashboard` - Recruiter Dashboard
+  - `/recruiter/jobs` - Job Postings Management
   - `/admin/login` - Admin Login
   - `/student/dashboard` - Student Dashboard
   - `/student/recommendations` - AI Recommendations
@@ -78,7 +100,8 @@ src/
 │   │   ├── SettingsPage.jsx      # Account settings
 │   │   └── NotificationsPage.jsx # Notification center
 │   ├── recdashboard/
-│   │   └── RecruiterDashboard.jsx # Recruiter portal with AI insights
+│   │   ├── RecruiterDashboard.jsx # Recruiter portal with AI insights
+│   │   └── Postings.jsx          # Job postings management
 │   ├── Login.jsx                 # Multi-role entry point
 │   ├── Register.jsx              # Account creation
 │   ├── RecruiterLogin.jsx        # Recruiter entry

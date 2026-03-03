@@ -10,6 +10,7 @@ import Profile from './components/dashboard/Profile';
 import SettingsPage from './components/dashboard/SettingsPage';
 import NotificationsPage from './components/dashboard/NotificationsPage';
 import RecruiterDashboard from './components/recdashboard/RecruiterDashboard';
+import Postings from './components/recdashboard/Postings';
 
 function App() {
   return (
@@ -25,6 +26,8 @@ function App() {
         <Route path="/student/settings" element={<SettingsPage />} />
         <Route path="/student/notifications" element={<NotificationsPage />} />
         <Route path="/recruiter/dashboard" element={<RecruiterDashboard />} />
+        <Route path="/recruiter" element={<RecruiterDashboard />} />
+        <Route path="/recruiter/jobs" element={<Postings />} />
       </Routes>
     </Router>
   );
