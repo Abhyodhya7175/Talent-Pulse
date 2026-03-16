@@ -11,6 +11,10 @@ import SettingsPage from './components/dashboard/SettingsPage';
 import NotificationsPage from './components/dashboard/NotificationsPage';
 import RecruiterDashboard from './components/recdashboard/RecruiterDashboard';
 import Postings from './components/recdashboard/Postings';
+import Candidates from './components/recdashboard/Candidates';
+import CandidateProfilePage from './components/recdashboard/CandidateProfilePage';
+import CandidateInterviewPage from './components/recdashboard/CandidateInterviewPage';
+import CandidateFavoritesPage from './components/recdashboard/CandidateFavoritesPage';
 
 function App() {
   return (
@@ -28,6 +32,10 @@ function App() {
         <Route path="/recruiter/dashboard" element={<RecruiterDashboard />} />
         <Route path="/recruiter" element={<RecruiterDashboard />} />
         <Route path="/recruiter/jobs" element={<Postings />} />
+        <Route path="/recruiter/candidates" element={<Candidates />} />
+        <Route path="/recruiter/candidates/:candidateId" element={<CandidateProfilePage />} />
+        <Route path="/recruiter/candidates/:candidateId/interview" element={<CandidateInterviewPage />} />
+        <Route path="/recruiter/candidates/favorites/:candidateId" element={<CandidateFavoritesPage />} />
       </Routes>
     </Router>
   );

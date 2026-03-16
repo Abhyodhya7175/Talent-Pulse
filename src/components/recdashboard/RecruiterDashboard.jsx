@@ -196,7 +196,7 @@ const RecruiterDashboard = () => {
                       className="w-full sm:w-48 pl-9 pr-3 py-2 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl text-sm text-slate-900 dark:text-white placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all"
                     />
                   </div>
-                  <button className="text-indigo-500 text-sm font-bold hover:underline whitespace-nowrap">View All</button>
+                  <Link to="/recruiter/candidates" className="text-indigo-500 text-sm font-bold hover:underline whitespace-nowrap">View All</Link>
                 </div>
               </div>
 
