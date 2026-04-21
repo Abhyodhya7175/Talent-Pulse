@@ -7,12 +7,33 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import logo from '../../assets/talent-pulse-logo.png';
+import { getRecommendations } from '../../services/api';
+
+const mapRecommendationToUi = (job) => ({
+  id: job.id,
+  title: job.title,
+  company: job.department,
+  loc: job.location,
+  type: job.employment_type.replace('-', ' '),
+  score: job.match_score,
+  tags: job.required_skills,
+  logo: '',
+  matchDetails: {
+    skillsMatched: job.matched_skills,
+    skillsMissing: job.missing_skills,
+    experienceMatch: job.match_score >= 70,
+    locationMatch: job.location.toLowerCase().includes('remote'),
+  },
+});
 
 const Recommendations = () => {
   const [openMenuId, setOpenMenuId] = useState(null);
   const [activeNav, setActiveNav] = useState('recommendations');
   const [hoveredMatchId, setHoveredMatchId] = useState(null);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [recommendedJobs, setRecommendedJobs] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState('');
   const notificationRef = useRef(null);
 
   // Sample notifications data
@@ -46,73 +67,22 @@ const Recommendations = () => {
     }
   };
 
-  // Sample data simulating the AI recommendation engine results
-  const recommendedJobs = [
-    { 
-      id: 1, 
-      title: "Backend Engineer", 
-      company: "Meta", 
-      loc: "Remote", 
-      type: "Full-time", 
-      score: 96, 
-      tags: ["Python", "FastAPI", "PostgreSQL"], 
-      logo: "https://img.logo.dev/meta.com?token=pk_H1z1R2K2SxuyCCd3izKt5w&size=154&retina=true",
-      matchDetails: { 
-        skillsMatched: ["Python", "FastAPI"], 
-        skillsMissing: ["PostgreSQL"],
-        experienceMatch: true,
-        locationMatch: true
-      } 
-    },
-    { 
-      id: 2, 
-      title: "Data Scientist", 
-      company: "Tesla", 
-      loc: "Austin, TX", 
-      type: "Full-time", 
-      score: 89, 
-      tags: ["Python", "PyTorch", "ML"], 
-      logo: "https://img.logo.dev/tesla.com?token=pk_H1z1R2K2SxuyCCd3izKt5w&size=194&retina=true",
-      matchDetails: { 
-        skillsMatched: ["Python", "ML"], 
-        skillsMissing: ["PyTorch"],
-        experienceMatch: true,
-        locationMatch: false
-      } 
-    },
-    { 
-      id: 3, 
-      title: "Full Stack Developer", 
-      company: "Netflix", 
-      loc: "Los Gatos, CA", 
-      type: "Contract", 
-      score: 92, 
-      tags: ["Next.js", "Node.js", "Tailwind"], 
-      logo: "https://img.logo.dev/netflix.com?token=pk_H1z1R2K2SxuyCCd3izKt5w&size=194&retina=true",
-      matchDetails: { 
-        skillsMatched: ["Next.js", "Node.js", "Tailwind"], 
-        skillsMissing: [],
-        experienceMatch: true,
-        locationMatch: false
-      } 
-    },
-    { 
-      id: 4, 
-      title: "Product Designer", 
-      company: "Spotify", 
-      loc: "Remote", 
-      type: "Full-time", 
-      score: 84, 
-      tags: ["Figma", "UI/UX", "Research"], 
-      logo: "https://img.logo.dev/spotify.com?token=pk_H1z1R2K2SxuyCCd3izKt5w&size=194&retina=true",
-      matchDetails: { 
-        skillsMatched: ["Figma", "UI/UX"], 
-        skillsMissing: ["Research"],
-        experienceMatch: false,
-        locationMatch: true
-      } 
-    },
-  ];
+  useEffect(() => {
+    const loadRecommendations = async () => {
+      setError('');
+      setIsLoading(true);
+      try {
+        const jobs = await getRecommendations();
+        setRecommendedJobs(jobs.map(mapRecommendationToUi));
+      } catch (recommendationError) {
+        setError(recommendationError.message || 'Unable to load recommendations');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadRecommendations();
+  }, []);
 
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, path: '/student/dashboard' },
@@ -284,8 +254,22 @@ const Recommendations = () => {
             </div>
           </div>
 
+          {error && (
+            <div className="mb-6 rounded-2xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-600 dark:text-red-300">
+              {error}
+            </div>
+          )}
+
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-            {recommendedJobs.map((job) => {
+            {isLoading ? (
+              <div className="xl:col-span-2 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-3xl p-12 text-center text-slate-500 dark:text-slate-400">
+                Loading recommendations...
+              </div>
+            ) : recommendedJobs.length === 0 ? (
+              <div className="xl:col-span-2 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-3xl p-12 text-center text-slate-500 dark:text-slate-400">
+                No active recommendations yet. Add more skills to your profile to improve match results.
+              </div>
+            ) : recommendedJobs.map((job) => {
               // Determine if this is the top pick (highest score)
               const isTopPick = job.score === Math.max(...recommendedJobs.map(j => j.score));
               

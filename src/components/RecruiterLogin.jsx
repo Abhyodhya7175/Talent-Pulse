@@ -2,15 +2,38 @@ import React from 'react';
 import { useState } from 'react';
 import { Briefcase, Lock, Mail,Eye,EyeOff } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
+import { authStorage, getMe, login } from '../services/api';
 
 const RecruiterLogin = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    // Navigate to recruiter dashboard on login
-    navigate('/recruiter/dashboard');
+    setError('');
+    setIsLoading(true);
+
+    try {
+      const { access_token: accessToken } = await login({ email, password });
+      authStorage.setToken(accessToken);
+
+      const currentUser = await getMe();
+      if (currentUser.role !== 'recruiter' && currentUser.role !== 'admin') {
+        authStorage.clearToken();
+        setError('Please use the student portal for this account.');
+        return;
+      }
+
+      navigate('/recruiter/dashboard');
+    } catch (loginError) {
+      setError(loginError.message || 'Unable to sign in');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -27,17 +50,22 @@ const RecruiterLogin = () => {
         <form className="space-y-5" onSubmit={handleLogin}>
           <div className="relative group">
             <Mail className="absolute left-4 top-3.5 h-5 w-5 text-slate-500 group-focus-within:text-emerald-500 transition-colors" />
-            <input type="email" placeholder="Work Email" className="w-full pl-12 pr-4 py-3.5 bg-slate-800 border border-slate-700 rounded-xl text-white outline-none focus:ring-2 focus:ring-emerald-500/50" />
+            <input type="email" placeholder="Work Email" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full pl-12 pr-4 py-3.5 bg-slate-800 border border-slate-700 rounded-xl text-white outline-none focus:ring-2 focus:ring-emerald-500/50" />
           </div>
           <div className="relative group">
             <Lock className="absolute left-4 top-3.5 h-5 w-5 text-slate-500 group-focus-within:text-emerald-500 transition-colors" />
-            <input type={showPassword ? "text" : "password"} placeholder='••••••••' className="w-full pl-12 pr-4 py-3.5 bg-slate-800 border border-slate-700 rounded-xl text-white outline-none focus:ring-2 focus:ring-emerald-500/50" />
+            <input type={showPassword ? "text" : "password"} placeholder='••••••••' value={password} onChange={(e) => setPassword(e.target.value)} className="w-full pl-12 pr-4 py-3.5 bg-slate-800 border border-slate-700 rounded-xl text-white outline-none focus:ring-2 focus:ring-emerald-500/50" />
             <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-500 hover:text-emerald-500 transition-colors">
               {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
             </button>
           </div>
-          <button className="w-full bg-emerald-600 text-white py-3.5 rounded-xl font-bold hover:bg-emerald-700 transition-all">
-            Login as Recruiter
+          {error && (
+            <p className="text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3">
+              {error}
+            </p>
+          )}
+          <button disabled={isLoading} className="w-full bg-emerald-600 text-white py-3.5 rounded-xl font-bold hover:bg-emerald-700 transition-all disabled:opacity-60 disabled:cursor-not-allowed">
+            {isLoading ? 'Signing in...' : 'Login as Recruiter'}
           </button>
         </form>
         <p className="mt-8 text-center text-slate-500 text-sm">

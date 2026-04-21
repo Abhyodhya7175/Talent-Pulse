@@ -7,6 +7,24 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import logo from '../../assets/talent-pulse-logo.png';
+import { authStorage, createJob, deleteJob, listJobs, updateJob } from '../../services/api';
+
+const mapJobToUi = (job) => ({
+  id: job.id,
+  title: job.title,
+  department: job.department,
+  location: job.location,
+  type: job.employment_type.replace('-', ' '),
+  salary: job.salary_min || job.salary_max ? `$${(job.salary_min || 0).toLocaleString()} - $${(job.salary_max || 0).toLocaleString()}` : 'N/A',
+  status: job.status,
+  postedDate: job.created_at,
+  expiresDate: job.expires_at,
+  views: job.views,
+  applicants: job.applicants_count,
+  shortlisted: job.ai_shortlisted_count,
+  skills: job.required_skills || [],
+  description: job.description,
+});
 
 const Postings = () => {
   const [showNotifications, setShowNotifications] = useState(false);
@@ -15,108 +33,11 @@ const Postings = () => {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showFilterDropdown, setShowFilterDropdown] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState(null);
+  const [jobPostings, setJobPostings] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState('');
   const notificationRef = useRef(null);
   const filterRef = useRef(null);
-
-  // Sample job postings data
-  const [jobPostings] = useState([
-    {
-      id: 1,
-      title: 'Senior Backend Engineer',
-      department: 'Engineering',
-      location: 'San Francisco, CA',
-      type: 'Full-time',
-      salary: '$150k - $200k',
-      status: 'active',
-      postedDate: '2026-02-15',
-      expiresDate: '2026-03-15',
-      views: 1240,
-      applicants: 86,
-      shortlisted: 12,
-      skills: ['Python', 'FastAPI', 'PostgreSQL', 'AWS'],
-      description: 'We are looking for an experienced Backend Engineer to join our growing team...'
-    },
-    {
-      id: 2,
-      title: 'Full Stack Developer',
-      department: 'Engineering',
-      location: 'Remote',
-      type: 'Full-time',
-      salary: '$120k - $160k',
-      status: 'active',
-      postedDate: '2026-02-20',
-      expiresDate: '2026-03-20',
-      views: 890,
-      applicants: 54,
-      shortlisted: 8,
-      skills: ['React', 'Node.js', 'MongoDB', 'TypeScript'],
-      description: 'Join our product team to build innovative solutions...'
-    },
-    {
-      id: 3,
-      title: 'Data Scientist',
-      department: 'Data & Analytics',
-      location: 'New York, NY',
-      type: 'Full-time',
-      salary: '$140k - $180k',
-      status: 'paused',
-      postedDate: '2026-02-10',
-      expiresDate: '2026-03-10',
-      views: 560,
-      applicants: 32,
-      shortlisted: 5,
-      skills: ['Python', 'TensorFlow', 'SQL', 'Machine Learning'],
-      description: 'Looking for a passionate Data Scientist to drive insights...'
-    },
-    {
-      id: 4,
-      title: 'DevOps Engineer',
-      department: 'Infrastructure',
-      location: 'Austin, TX',
-      type: 'Full-time',
-      salary: '$130k - $170k',
-      status: 'draft',
-      postedDate: null,
-      expiresDate: null,
-      views: 0,
-      applicants: 0,
-      shortlisted: 0,
-      skills: ['Docker', 'Kubernetes', 'AWS', 'Terraform'],
-      description: 'Help us scale our infrastructure and improve CI/CD...'
-    },
-    {
-      id: 5,
-      title: 'Product Designer',
-      department: 'Design',
-      location: 'Los Angeles, CA',
-      type: 'Contract',
-      salary: '$80/hr - $120/hr',
-      status: 'expired',
-      postedDate: '2026-01-15',
-      expiresDate: '2026-02-15',
-      views: 720,
-      applicants: 45,
-      shortlisted: 7,
-      skills: ['Figma', 'UI/UX', 'Prototyping', 'User Research'],
-      description: 'Create beautiful and intuitive user experiences...'
-    },
-    {
-      id: 6,
-      title: 'Machine Learning Engineer',
-      department: 'AI/ML',
-      location: 'Seattle, WA',
-      type: 'Full-time',
-      salary: '$160k - $220k',
-      status: 'active',
-      postedDate: '2026-02-25',
-      expiresDate: '2026-03-25',
-      views: 450,
-      applicants: 28,
-      shortlisted: 4,
-      skills: ['Python', 'PyTorch', 'NLP', 'Computer Vision'],
-      description: 'Build cutting-edge ML models to power our products...'
-    }
-  ]);
 
   // Form state for new job posting
   const [newJob, setNewJob] = useState({
@@ -129,6 +50,28 @@ const Postings = () => {
     skills: '',
     description: ''
   });
+
+  const loadJobs = async () => {
+    setError('');
+    setIsLoading(true);
+    try {
+      const jobs = await listJobs({ onlyMine: true });
+      setJobPostings(jobs.map(mapJobToUi));
+    } catch (loadError) {
+      setError(loadError.message || 'Unable to load job postings');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (authStorage.getToken()) {
+      loadJobs();
+    } else {
+      setError('Please sign in again to manage postings.');
+      setIsLoading(false);
+    }
+  }, []);
 
   // Notifications data
   const notifications = [
@@ -217,11 +160,7 @@ const Postings = () => {
     return diff;
   };
 
-  const handleCreateJob = (e) => {
-    e.preventDefault();
-    // Handle job creation logic here
-    console.log('Creating job:', newJob);
-    setShowCreateModal(false);
+  const resetJobForm = () => {
     setNewJob({
       title: '',
       department: '',
@@ -232,6 +171,46 @@ const Postings = () => {
       skills: '',
       description: ''
     });
+  };
+
+  const handleCreateJob = async (status) => {
+    try {
+      await createJob({
+        title: newJob.title,
+        department: newJob.department,
+        location: newJob.location,
+        employment_type: newJob.type.toLowerCase().replace(' ', '-'),
+        salary_min: newJob.salaryMin ? Number(newJob.salaryMin) : null,
+        salary_max: newJob.salaryMax ? Number(newJob.salaryMax) : null,
+        required_skills: newJob.skills.split(',').map((skill) => skill.trim()).filter(Boolean),
+        description: newJob.description,
+        status,
+      });
+      setShowCreateModal(false);
+      resetJobForm();
+      await loadJobs();
+    } catch (createError) {
+      setError(createError.message || 'Unable to create job');
+    }
+  };
+
+  const handleDeleteJob = async (jobId) => {
+    try {
+      await deleteJob(jobId);
+      await loadJobs();
+    } catch (deleteError) {
+      setError(deleteError.message || 'Unable to delete job');
+    }
+  };
+
+  const handleToggleStatus = async (job) => {
+    const nextStatus = job.status === 'active' ? 'paused' : 'active';
+    try {
+      await updateJob(job.id, { status: nextStatus });
+      await loadJobs();
+    } catch (updateError) {
+      setError(updateError.message || 'Unable to update job');
+    }
   };
 
   return (
@@ -339,6 +318,12 @@ const Postings = () => {
             </button>
           </div>
 
+          {error && (
+            <div className="mb-6 rounded-2xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-600 dark:text-red-300">
+              {error}
+            </div>
+          )}
+
           {/* Stats Cards */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
             <div className="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 p-5 rounded-2xl flex items-center gap-4 shadow-sm">
@@ -427,7 +412,11 @@ const Postings = () => {
 
           {/* Job Listings */}
           <div className="space-y-4">
-            {filteredJobs.length === 0 ? (
+            {isLoading ? (
+              <div className="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl p-12 text-center text-slate-500 dark:text-slate-400">
+                Loading job postings...
+              </div>
+            ) : filteredJobs.length === 0 ? (
               <div className="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl p-12 text-center">
                 <Briefcase size={48} className="mx-auto text-slate-300 dark:text-slate-600 mb-4" />
                 <h3 className="text-lg font-bold text-slate-600 dark:text-slate-400 mb-2">No job postings found</h3>
@@ -533,26 +522,38 @@ const Postings = () => {
                           
                           {activeDropdown === job.id && (
                             <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-white/10 rounded-xl shadow-xl overflow-hidden z-40">
-                              <button className="w-full px-4 py-3 text-left text-sm hover:bg-slate-100 dark:hover:bg-white/10 transition-all flex items-center gap-3">
+                              <button type="button" onClick={() => setError('Job details view is not connected yet.')} className="w-full px-4 py-3 text-left text-sm hover:bg-slate-100 dark:hover:bg-white/10 transition-all flex items-center gap-3">
                                 <Eye size={16} className="text-slate-400" /> View Details
                               </button>
-                              <button className="w-full px-4 py-3 text-left text-sm hover:bg-slate-100 dark:hover:bg-white/10 transition-all flex items-center gap-3">
+                              <button type="button" onClick={() => setError('Editing a posting is not connected yet. Use duplicate or create a new posting.')} className="w-full px-4 py-3 text-left text-sm hover:bg-slate-100 dark:hover:bg-white/10 transition-all flex items-center gap-3">
                                 <Edit3 size={16} className="text-slate-400" /> Edit Posting
                               </button>
-                              <button className="w-full px-4 py-3 text-left text-sm hover:bg-slate-100 dark:hover:bg-white/10 transition-all flex items-center gap-3">
+                              <button type="button" onClick={() => {
+                                createJob({
+                                  title: `${job.title} Copy`,
+                                  department: job.department,
+                                  location: job.location,
+                                  employment_type: job.type.toLowerCase().replace(' ', '-'),
+                                  salary_min: null,
+                                  salary_max: null,
+                                  required_skills: job.skills,
+                                  description: job.description,
+                                  status: 'draft',
+                                }).then(loadJobs).catch((duplicateError) => setError(duplicateError.message || 'Unable to duplicate job'));
+                              }} className="w-full px-4 py-3 text-left text-sm hover:bg-slate-100 dark:hover:bg-white/10 transition-all flex items-center gap-3">
                                 <Copy size={16} className="text-slate-400" /> Duplicate
                               </button>
                               {job.status === 'active' ? (
-                                <button className="w-full px-4 py-3 text-left text-sm hover:bg-slate-100 dark:hover:bg-white/10 transition-all flex items-center gap-3 text-amber-500">
+                                <button type="button" onClick={() => handleToggleStatus(job)} className="w-full px-4 py-3 text-left text-sm hover:bg-slate-100 dark:hover:bg-white/10 transition-all flex items-center gap-3 text-amber-500">
                                   <Pause size={16} /> Pause Posting
                                 </button>
                               ) : job.status === 'paused' && (
-                                <button className="w-full px-4 py-3 text-left text-sm hover:bg-slate-100 dark:hover:bg-white/10 transition-all flex items-center gap-3 text-green-500">
+                                <button type="button" onClick={() => handleToggleStatus(job)} className="w-full px-4 py-3 text-left text-sm hover:bg-slate-100 dark:hover:bg-white/10 transition-all flex items-center gap-3 text-green-500">
                                   <Play size={16} /> Resume Posting
                                 </button>
                               )}
                               <div className="border-t border-slate-100 dark:border-white/10">
-                                <button className="w-full px-4 py-3 text-left text-sm hover:bg-red-50 dark:hover:bg-red-500/10 transition-all flex items-center gap-3 text-red-500">
+                                <button type="button" onClick={() => handleDeleteJob(job.id)} className="w-full px-4 py-3 text-left text-sm hover:bg-red-50 dark:hover:bg-red-500/10 transition-all flex items-center gap-3 text-red-500">
                                   <Trash2 size={16} /> Delete
                                 </button>
                               </div>
@@ -606,7 +607,7 @@ const Postings = () => {
             </div>
 
             {/* Modal Body */}
-            <form onSubmit={handleCreateJob} className="p-8 space-y-6">
+            <form onSubmit={(e) => e.preventDefault()} className="p-8 space-y-6">
               {/* Job Title */}
               <div>
                 <label className="block text-sm font-bold text-slate-600 dark:text-slate-300 mb-2">Job Title *</label>
@@ -741,13 +742,15 @@ const Postings = () => {
                   Cancel
                 </button>
                 <button
-                  type="submit"
+                  type="button"
+                  onClick={() => handleCreateJob('draft')}
                   className="flex-1 px-6 py-3 bg-slate-800 dark:bg-white/10 border border-slate-700 dark:border-white/10 text-white rounded-xl font-bold hover:bg-slate-700 dark:hover:bg-white/20 transition-all flex items-center justify-center gap-2"
                 >
                   <Edit3 size={18} /> Save as Draft
                 </button>
                 <button
-                  type="submit"
+                  type="button"
+                  onClick={() => handleCreateJob('active')}
                   className="flex-1 px-6 py-3 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-500 transition-all shadow-lg shadow-indigo-500/20 flex items-center justify-center gap-2"
                 >
                   <PlusCircle size={18} /> Publish Job

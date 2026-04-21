@@ -2,14 +2,38 @@ import React, { useState } from 'react';
 import { Mail, Eye, EyeOff, Lock, User, Briefcase, ShieldCheck } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
+import { authStorage, getMe, login } from '../services/api';
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    navigate('/student/dashboard');
+    setError('');
+    setIsLoading(true);
+
+    try {
+      const { access_token: accessToken } = await login({ email, password });
+      authStorage.setToken(accessToken);
+
+      const currentUser = await getMe();
+      if (currentUser.role !== 'student') {
+        authStorage.clearToken();
+        setError('Please use the recruiter or admin portal for this account.');
+        return;
+      }
+
+      navigate('/student/dashboard');
+    } catch (loginError) {
+      setError(loginError.message || 'Unable to sign in');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
 
@@ -47,7 +71,7 @@ const Login = () => {
             <label className="block text-sm font-semibold text-slate-300 mb-1.5 ml-1 text-left">Email Address</label>
             <div className="relative group">
               <Mail className="absolute left-4 top-3.5 h-5 w-5 text-slate-400 group-focus-within:text-indigo-400 transition-colors" />
-              <input type="email" required className="w-full pl-11 pr-4 py-3.5 bg-slate-900/50 border border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all outline-none text-white placeholder:text-slate-500" placeholder="name@example.com" />
+              <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} className="w-full pl-11 pr-4 py-3.5 bg-slate-900/50 border border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all outline-none text-white placeholder:text-slate-500" placeholder="name@example.com" />
             </div>
           </div>
           
@@ -55,15 +79,21 @@ const Login = () => {
             <label className="block text-sm font-semibold text-slate-300 mb-1.5 ml-1 text-left">Password</label>
             <div className="relative group">
               <Lock className="absolute left-4 top-3.5 h-5 w-5 text-slate-400 group-focus-within:text-indigo-400 transition-colors" />
-              <input type={showPassword ? "text" : "password"} required className="w-full pl-11 pr-12 py-3.5 bg-slate-900/50 border border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all outline-none text-white placeholder:text-slate-500" placeholder="••••••••" />
+              <input type={showPassword ? "text" : "password"} required value={password} onChange={(e) => setPassword(e.target.value)} className="w-full pl-11 pr-12 py-3.5 bg-slate-900/50 border border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all outline-none text-white placeholder:text-slate-500" placeholder="••••••••" />
               <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-indigo-400 transition-colors">
                 {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
               </button>
             </div>
           </div>
 
-          <button className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3.5 rounded-xl font-bold hover:from-indigo-500 hover:to-purple-500 active:scale-[0.98] transition-all shadow-lg shadow-indigo-500/25 border border-white/10">
-            Sign In as Student
+          {error && (
+            <p className="text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3">
+              {error}
+            </p>
+          )}
+
+          <button disabled={isLoading} className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3.5 rounded-xl font-bold hover:from-indigo-500 hover:to-purple-500 active:scale-[0.98] transition-all shadow-lg shadow-indigo-500/25 border border-white/10 disabled:opacity-60 disabled:cursor-not-allowed">
+            {isLoading ? 'Signing in...' : 'Sign In as Student'}
           </button>
         </form>
 

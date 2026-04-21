@@ -1,18 +1,23 @@
 import React, { useState } from 'react';
 import { Eye, EyeOff, Mail, Lock, User, Chrome, Linkedin, ArrowLeft } from 'lucide-react';
-import {Link} from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { authStorage, register as registerUser } from '../services/api';
 
 const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
     email: '',
     password: '',
     confirmPassword: '',
+    role: 'student',
     agreeToTerms: false
   });
+  const navigate = useNavigate();
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -22,22 +27,38 @@ const Register = () => {
     }));
   };
 
-  const handleRegister = (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
+    setError('');
     
     // Basic validation
     if (formData.password !== formData.confirmPassword) {
-      alert('Passwords do not match');
+      setError('Passwords do not match');
       return;
     }
     
     if (!formData.agreeToTerms) {
-      alert('Please agree to the terms and conditions');
+      setError('Please agree to the terms and conditions');
       return;
     }
 
-    // Handle registration logic here
-    console.log('Registration attempt:', formData);
+    setIsLoading(true);
+
+    try {
+      const response = await registerUser({
+        full_name: `${formData.firstName} ${formData.lastName}`.trim(),
+        email: formData.email,
+        password: formData.password,
+        role: formData.role,
+      });
+
+      authStorage.setToken(response.access_token);
+      navigate(formData.role === 'recruiter' ? '/recruiter/dashboard' : '/student/dashboard');
+    } catch (registerError) {
+      setError(registerError.message || 'Unable to create account');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -111,6 +132,23 @@ const Register = () => {
                 />
               </div>
             </div>
+          </div>
+
+          <div>
+            <label htmlFor="role" className="block text-sm font-medium text-white mb-2 font-plus-jakarta">
+              Account Type
+            </label>
+            <select
+              id="role"
+              name="role"
+              value={formData.role}
+              onChange={handleInputChange}
+              className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-white/30 focus:border-transparent transition-all duration-200 font-plus-jakarta"
+            >
+              <option value="student" className="text-slate-900">Student</option>
+              <option value="recruiter" className="text-slate-900">Recruiter</option>
+              <option value="admin" className="text-slate-900">Admin</option>
+            </select>
           </div>
 
           {/* Email Field */}
@@ -221,15 +259,22 @@ const Register = () => {
             </label>
           </div>
 
+          {error && (
+            <p className="text-sm text-red-200 bg-red-500/15 border border-red-400/20 rounded-xl px-4 py-3">
+              {error}
+            </p>
+          )}
+
           {/* Register Button */}
           <button
             type="submit"
+            disabled={isLoading}
             className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white py-3 px-4 rounded-lg
                       font-medium hover:from-indigo-600 hover:to-purple-700 focus:outline-none focus:ring-2 
                       focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200 font-plus-jakarta
-                      transform hover:scale-105"
+                      transform hover:scale-105 disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            Create Account
+            {isLoading ? 'Creating Account...' : 'Create Account'}
           </button>
         </form>
 

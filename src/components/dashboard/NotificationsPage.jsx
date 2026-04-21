@@ -6,11 +6,20 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import logo from '../../assets/talent-pulse-logo.png';
+import { listNotifications, markNotificationRead } from '../../services/api';
+
+const formatNotificationDate = (timestamp) => {
+  const date = new Date(timestamp);
+  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+};
 
 const NotificationsPage = () => {
   const [activeNav] = useState('notifications');
   const [activeFilter, setActiveFilter] = useState('all');
   const [showNotificationDropdown, setShowNotificationDropdown] = useState(false);
+  const [notifications, setNotifications] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState('');
   const notificationRef = useRef(null);
 
   const navItems = [
@@ -20,80 +29,30 @@ const NotificationsPage = () => {
     { id: 'settings', label: 'Settings', icon: Settings, path: '/student/settings' },
   ];
 
-  const [notifications, setNotifications] = useState([
-    { 
-      id: 1, 
-      type: 'job', 
-      title: 'New Job Match!', 
-      message: 'Backend Engineer at Meta matches 96% with your profile. This role requires Python, FastAPI, and PostgreSQL skills.', 
-      time: '5 min ago',
-      date: 'Today',
-      unread: true 
-    },
-    { 
-      id: 2, 
-      type: 'application', 
-      title: 'Application Viewed', 
-      message: 'Tesla viewed your application for Data Scientist position. They spent 3 minutes reviewing your profile.', 
-      time: '1 hour ago',
-      date: 'Today',
-      unread: true 
-    },
-    { 
-      id: 3, 
-      type: 'success', 
-      title: 'Profile Complete!', 
-      message: 'Congratulations! Your profile is now 100% complete. You are now more visible to recruiters.', 
-      time: '2 hours ago',
-      date: 'Today',
-      unread: false 
-    },
-    { 
-      id: 4, 
-      type: 'alert', 
-      title: 'Reminder', 
-      message: 'Complete your skills assessment to improve your job matches by up to 25%.', 
-      time: '1 day ago',
-      date: 'Yesterday',
-      unread: false 
-    },
-    { 
-      id: 5, 
-      type: 'job', 
-      title: 'New Job Match!', 
-      message: 'Full Stack Developer at Netflix matches 92% with your profile. Remote position available.', 
-      time: '1 day ago',
-      date: 'Yesterday',
-      unread: false 
-    },
-    { 
-      id: 6, 
-      type: 'application', 
-      title: 'Application Shortlisted', 
-      message: 'Your application for UI Designer at Spotify has been shortlisted for the next round.', 
-      time: '2 days ago',
-      date: 'Feb 19, 2026',
-      unread: false 
-    },
-    { 
-      id: 7, 
-      type: 'success', 
-      title: 'Resume Updated', 
-      message: 'Your resume has been successfully updated. AI has extracted 12 new skills.', 
-      time: '3 days ago',
-      date: 'Feb 18, 2026',
-      unread: false 
-    },
-    { 
-      id: 8, 
-      type: 'alert', 
-      title: 'New Feature Available', 
-      message: 'AI-powered interview preparation is now available. Practice with our smart assistant.', 
-      time: '4 days ago',
-      date: 'Feb 17, 2026',
-      unread: false 
-    },
-  ]);
+  useEffect(() => {
+    const loadNotifications = async () => {
+      setError('');
+      setIsLoading(true);
+
+      try {
+        const items = await listNotifications();
+        setNotifications(
+          items.map((item) => ({
+            ...item,
+            unread: !item.is_read,
+            date: formatNotificationDate(item.created_at),
+            time: formatNotificationDate(item.created_at),
+          }))
+        );
+      } catch (loadError) {
+        setError(loadError.message || 'Unable to load notifications');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadNotifications();
+  }, []);
 
   const unreadCount = notifications.filter(n => n.unread).length;
 
@@ -141,13 +100,15 @@ const NotificationsPage = () => {
   };
 
   const markAsRead = (id) => {
-    setNotifications(notifications.map(n => 
-      n.id === id ? { ...n, unread: false } : n
-    ));
+    markNotificationRead(id)
+      .then(() => setNotifications(notifications.map((n) => (n.id === id ? { ...n, unread: false, is_read: true } : n))))
+      .catch((markError) => setError(markError.message || 'Unable to mark notification as read'));
   };
 
   const markAllAsRead = () => {
-    setNotifications(notifications.map(n => ({ ...n, unread: false })));
+    Promise.all(notifications.filter((n) => n.unread).map((notification) => markNotificationRead(notification.id)))
+      .then(() => setNotifications(notifications.map((n) => ({ ...n, unread: false, is_read: true }))))
+      .catch((bulkError) => setError(bulkError.message || 'Unable to update notifications'));
   };
 
   const deleteNotification = (id) => {
@@ -244,6 +205,12 @@ const NotificationsPage = () => {
           )}
         </div>
 
+        {error && (
+          <div className="mb-6 rounded-2xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-600 dark:text-red-300">
+            {error}
+          </div>
+        )}
+
         {/* Filter Tabs */}
         <div className="flex flex-wrap gap-2 mb-6">
           {filterTabs.map((tab) => (
@@ -270,7 +237,11 @@ const NotificationsPage = () => {
 
         {/* Notifications List */}
         <div className="space-y-6">
-          {Object.keys(groupedNotifications).length === 0 ? (
+          {isLoading ? (
+            <div className="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl p-12 text-center text-slate-500 dark:text-slate-400">
+              Loading notifications...
+            </div>
+          ) : Object.keys(groupedNotifications).length === 0 ? (
             <div className="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl p-12 text-center">
               <Bell size={48} className="mx-auto text-slate-300 dark:text-slate-600 mb-4" />
               <h3 className="text-lg font-semibold text-slate-600 dark:text-slate-300">No notifications</h3>
