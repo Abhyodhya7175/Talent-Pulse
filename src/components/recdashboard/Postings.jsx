@@ -3,7 +3,7 @@ import {
   Briefcase, PlusCircle, Search, Bell, LogOut, X, Eye, 
   Edit3, Trash2, Copy, Pause, Play, Users, Clock, MapPin,
   DollarSign, Calendar, Filter, ChevronDown, Building2,
-  TrendingUp, Zap, CheckCircle, AlertCircle, MoreVertical
+  Zap, CheckCircle, AlertCircle, MoreVertical
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import logo from '../../assets/talent-pulse-logo.png';

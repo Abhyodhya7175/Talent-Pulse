@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShieldAlert, Lock, User } from 'lucide-react';
+import { ShieldAlert } from 'lucide-react';
 
 const AdminLogin = () => {
   return (

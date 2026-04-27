@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { 
   Bell, Settings, User, LayoutDashboard, Lightbulb, LogOut, 
-  Briefcase, Eye, CheckCircle, AlertCircle, X, Check, Trash2,
-  Clock, Filter, Search
+  Briefcase, Eye, CheckCircle, AlertCircle, Check, Trash2,
+  Clock
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import logo from '../../assets/talent-pulse-logo.png';
@@ -14,7 +14,6 @@ const formatNotificationDate = (timestamp) => {
 };
 
 const NotificationsPage = () => {
-  const [activeNav] = useState('notifications');
   const [activeFilter, setActiveFilter] = useState('all');
   const [showNotificationDropdown, setShowNotificationDropdown] = useState(false);
   const [notifications, setNotifications] = useState([]);

@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { 
-  Layout, Briefcase, User, LogOut, Search, 
+  Briefcase, User, LogOut, Search, 
   Bell, Settings, MoreVertical, MapPin,LayoutDashboard,Lightbulb,
   Clock, ExternalLink, Bookmark, Ban,
   TrendingUp, Send, Award, ChevronRight, Sparkles, X, Eye, CheckCircle, AlertCircle
@@ -12,7 +12,7 @@ const StudentDashboard = () => {
   // State to track which job menu is currently open (collapsed/expanded)
   const [openMenuId, setOpenMenuId] = useState(null);
   // State to track active nav item
-  const [activeNav, setActiveNav] = useState('dashboard');
+  const activeNav = 'dashboard';
   const [showNotifications, setShowNotifications] = useState(false);
   const notificationRef = useRef(null);
 

@@ -1,14 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { 
-  Layout, Users, PlusCircle, Briefcase, 
-  Search, Bell, Filter, MoreVertical, LogOut, 
-  CheckCircle, Clock, TrendingUp, Zap, X, Eye, AlertCircle
+  Users, PlusCircle, Briefcase,
+  Search, Bell, MoreVertical, LogOut,
+  CheckCircle, TrendingUp, Zap, X, Eye, AlertCircle
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import logo from '../../assets/talent-pulse-logo.png';
 
 const RecruiterDashboard = () => {
-  const [activeNav] = useState('dashboard');
   const [showNotifications, setShowNotifications] = useState(false);
   const [candidateSearch, setCandidateSearch] = useState('');
   const notificationRef = useRef(null);

@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { 
-  Layout, Briefcase, User, Settings, LogOut, Search, 
+  Briefcase, User, Settings, LogOut, Search, 
   Bell, Filter, MapPin, Clock,LayoutDashboard,Lightbulb,
   MoreVertical, ExternalLink, Bookmark, Ban, Sparkles,
   Check, X, TrendingUp, Crown, Eye, CheckCircle, AlertCircle
@@ -28,7 +28,7 @@ const mapRecommendationToUi = (job) => ({
 
 const Recommendations = () => {
   const [openMenuId, setOpenMenuId] = useState(null);
-  const [activeNav, setActiveNav] = useState('recommendations');
+  const activeNav = 'recommendations';
   const [hoveredMatchId, setHoveredMatchId] = useState(null);
   const [showNotifications, setShowNotifications] = useState(false);
   const [recommendedJobs, setRecommendedJobs] = useState([]);

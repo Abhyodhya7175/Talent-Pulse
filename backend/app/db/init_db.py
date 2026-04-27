@@ -1,6 +1,7 @@
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from app.core.config import settings
 from app.core.security import get_password_hash
 from app.db.database import Base, engine
 from app.models import EmploymentType, Job, JobStatus, Notification, User, UserRole
@@ -8,6 +9,9 @@ from app.models import EmploymentType, Job, JobStatus, Notification, User, UserR
 
 def init_db() -> None:
     Base.metadata.create_all(bind=engine)
+
+    if not settings.enable_seed_data:
+        return
 
     with Session(engine) as session:
         _seed_users(session)

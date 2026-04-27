@@ -125,6 +125,39 @@ npm start
 npm run build
 ```
 
+## ☁️ Deployment Checklist (Vercel + FastAPI)
+
+Use this checklist to deploy frontend and backend without API connection issues.
+
+### 1) Deploy Backend (FastAPI)
+
+- Host `backend/` on a Python service (Render, Railway, Fly.io, VM, etc.).
+- Set backend env variables from `backend/.env.example`.
+- Most important variable for browser access:
+  - `ALLOWED_ORIGINS=https://your-frontend-domain.vercel.app`
+- Verify backend is reachable:
+  - `GET https://your-backend-domain/` returns status `ok`.
+  - `GET https://your-backend-domain/docs` opens FastAPI docs.
+
+### 2) Deploy Frontend (Vercel)
+
+- Vercel config is provided in `vercel.json` for CRA output and SPA rewrites.
+- In Vercel Project Settings -> Environment Variables, set:
+  - `REACT_APP_API_BASE_URL=https://your-backend-domain/api/v1`
+- Redeploy after setting env vars.
+
+### 3) Verify End-to-End
+
+- Open deployed frontend URL.
+- Register a user from `/register`.
+- Confirm no `Failed to fetch` error.
+- Confirm dashboard pages load API-backed data.
+
+### 4) Local Dev Env Files
+
+- Frontend template: `.env.example`
+- Backend template: `backend/.env.example`
+
 ## 📄 License
 
 This project is private and proprietary.

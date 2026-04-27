@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { 
-  User, Mail, Phone, MapPin, GraduationCap, 
+  User, Mail, MapPin, GraduationCap, 
   Briefcase, Plus, X, CheckCircle, Camera, Upload, Sparkles, Settings,
   LayoutDashboard, Bell, LogOut, Lightbulb, Eye, AlertCircle
 } from 'lucide-react';
@@ -54,21 +54,15 @@ const Profile = () => {
     { id: 'settings', label: 'Settings', icon: Settings, path: '/student/settings' },
   ];
 
-  // Logic to calculate profile completion percentage
-  const calculateCompletion = () => {
-    let score = 20; // Base score for account setup
-    if (skills.length > 0) score += 20;
-    if (skills.length > 5) score += 10;
-    if (hasResume) score += 40;
-    // Add 10% for basic info (Email/Location)
-    score += 10; 
-    return score;
-  };
-
   // Animate the progress bar on load
   useEffect(() => {
     const timer = setTimeout(() => {
-      setProgress(calculateCompletion());
+      let score = 20;
+      if (skills.length > 0) score += 20;
+      if (skills.length > 5) score += 10;
+      if (hasResume) score += 40;
+      score += 10;
+      setProgress(score);
     }, 500);
     return () => clearTimeout(timer);
   }, [skills, hasResume]);

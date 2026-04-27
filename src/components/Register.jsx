@@ -249,13 +249,13 @@ const Register = () => {
             />
             <label htmlFor="agreeToTerms" className="ml-3 text-sm text-white/80 font-plus-jakarta">
               I agree to the{' '}
-              <a href="#" className="text-white hover:text-white/80 transition-colors underline">
+              <Link to="/terms" className="text-white hover:text-white/80 transition-colors underline">
                 Terms of Service
-              </a>{' '}
+              </Link>{' '}
               and{' '}
-              <a href="#" className="text-white hover:text-white/80 transition-colors underline">
+              <Link to="/privacy" className="text-white hover:text-white/80 transition-colors underline">
                 Privacy Policy
-              </a>
+              </Link>
             </label>
           </div>
 
