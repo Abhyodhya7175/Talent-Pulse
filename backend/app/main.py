@@ -10,6 +10,8 @@ app = FastAPI(title=settings.project_name)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origins,
+    # Allow local dev frontends on any port (CRA, Vite, alternate ports).
+    allow_origin_regex=r"https?://(localhost|127\.0\.0\.1)(:\d+)?",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

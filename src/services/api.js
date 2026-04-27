@@ -23,10 +23,15 @@ async function request(path, options = {}) {
     headers.Authorization = `Bearer ${token}`;
   }
 
-  const response = await fetch(`${API_BASE_URL}${path}`, {
-    ...options,
-    headers,
-  });
+  let response;
+  try {
+    response = await fetch(`${API_BASE_URL}${path}`, {
+      ...options,
+      headers,
+    });
+  } catch {
+    throw new Error(`Unable to connect to API at ${API_BASE_URL}. Ensure the backend server is running and CORS is configured.`);
+  }
 
   if (!response.ok) {
     let message = 'Request failed';
